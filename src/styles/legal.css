@@ -1,0 +1,16 @@
+body {
+  margin: 0;
+  font-family: var(--font-base, 'Inter', sans-serif);
+  background-color: #fdfdfd;
+  color: var(--color-text-primary, #1e1b2c);
+}
+
+main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem;
+}
+
+h1 {
+  margin-bottom: 1.5rem;
+}

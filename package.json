@@ -1,0 +1,25 @@
+{
+  "name": "construtor-de-lps-melhorado",
+  "version": "1.0.0",
+  "description": "Landing page de captura de leads para Meu Nome Ok",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "landing-page",
+    "lead",
+    "vite"
+  ],
+  "author": "Meu Nome Ok",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^7.1.7"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.58.0"
+  }
+}

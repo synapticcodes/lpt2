@@ -1,0 +1,291 @@
+:root {
+  --color-lavender: #6f4cff;
+  --color-lavender-light: #ede8ff;
+  --color-white: #ffffff;
+  --color-yellow: #ffd24c;
+  --color-blue: #0057ff;
+  --color-text-primary: #1e1b2c;
+  --color-text-secondary: #3f3b53;
+  --color-surface: #f7f5ff;
+  --color-border: rgba(111, 76, 255, 0.12);
+  --shadow-soft: 0 24px 60px rgba(47, 26, 128, 0.14);
+  --radius-base: 20px;
+  --transition-base: 200ms ease;
+  --font-base: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body.thank-page {
+  margin: 0;
+  font-family: var(--font-base);
+  color: var(--color-text-primary);
+  background: linear-gradient(180deg, #ffffff 0%, rgba(237, 232, 255, 0.55) 38%, rgba(111, 76, 255, 0.1) 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.thank-container {
+  width: min(92%, 1080px);
+  margin: 0 auto;
+}
+
+.thank-header {
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(111, 76, 255, 0.15);
+  backdrop-filter: blur(12px);
+}
+
+.thank-header__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.thank-logo {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.thank-logo img {
+  height: 44px;
+  width: auto;
+  max-width: none;
+  display: block;
+  border-radius: 0;
+  object-fit: contain;
+}
+
+
+.thank-header__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.thank-main {
+  flex: 1;
+}
+
+.thank-hero {
+  padding: 3.5rem 0 2.5rem;
+}
+
+.thank-hero__grid {
+  display: grid;
+  gap: 2.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  align-items: start;
+}
+
+.thank-hero__eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 700;
+  color: var(--color-blue);
+  margin: 0 0 0.75rem;
+}
+
+.thank-hero__content h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+}
+
+.thank-hero__content p {
+  margin: 0 0 1.5rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+}
+
+.thank-counter {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 18px;
+  padding: 1.1rem 1.5rem;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-blue);
+  margin-bottom: 1.75rem;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.thank-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.thank-actions__note {
+  flex: 1 1 100%;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #d7263d;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.95rem 1.75rem;
+  border-radius: 999px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: transform var(--transition-base), box-shadow var(--transition-base), filter var(--transition-base);
+}
+
+.btn-whatsapp {
+  background: linear-gradient(135deg, #34d058, #109648);
+  color: var(--color-white);
+  box-shadow: 0 16px 30px rgba(16, 150, 72, 0.3);
+}
+
+.btn-whatsapp:hover,
+.btn-whatsapp:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 36px rgba(16, 150, 72, 0.32);
+}
+
+.btn-instagram {
+  background: linear-gradient(135deg, #6f4cff, #b06ffe);
+  color: var(--color-white);
+  box-shadow: 0 16px 30px rgba(111, 76, 255, 0.28);
+}
+
+.btn-instagram:hover,
+.btn-instagram:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 36px rgba(111, 76, 255, 0.32);
+}
+
+.thank-hero__card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 28px;
+  padding: 2rem;
+  border: 1px solid rgba(111, 76, 255, 0.18);
+  box-shadow: var(--shadow-soft);
+}
+
+.thank-hero__card h2 {
+  margin: 0 0 1.25rem;
+  font-size: 1.35rem;
+}
+
+.thank-hero__card ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 1rem;
+  color: var(--color-text-secondary);
+}
+
+.thank-hero__card li {
+  padding-left: 1.9rem;
+  position: relative;
+  line-height: 1.6;
+}
+
+.thank-hero__card li::before {
+  content: '✔';
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--color-blue);
+  font-weight: 700;
+}
+
+.thank-video {
+  padding: 2rem 0 3rem;
+}
+
+.thank-video__wrapper {
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(111, 76, 255, 0.12);
+  background: #050314;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.thank-video iframe {
+  width: 100%;
+  display: block;
+}
+
+.thank-video__intro {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-white);
+}
+
+.thank-steps {
+  padding: 0 0 4rem;
+}
+
+.thank-steps__list {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0 0;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.thank-steps__list li {
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 24px;
+  padding: 1.5rem 1.75rem;
+  border: 1px solid rgba(111, 76, 255, 0.16);
+  box-shadow: var(--shadow-soft);
+  line-height: 1.6;
+  color: var(--color-text-secondary);
+}
+
+.thank-steps__list strong {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--color-text-primary);
+}
+
+.thank-footer {
+  background: #1e1b2c;
+  color: var(--color-white);
+  padding: 2.5rem 0;
+}
+
+.thank-footer__content {
+  display: grid;
+  gap: 0.65rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 720px) {
+  .thank-header__content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .thank-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

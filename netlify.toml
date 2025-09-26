@@ -1,0 +1,26 @@
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+[[redirects]]
+  from = "/obrigado"
+  to = "/obrigado.html"
+  status = 200
+
+[[redirects]]
+  from = "/termos-de-uso"
+  to = "/termos-de-uso.html"
+  status = 200
+
+[[redirects]]
+  from = "/politica-de-privacidade"
+  to = "/politica-de-privacidade.html"
+  status = 200
+[[headers]]
+  for = "/*"
+    [headers.values]
+      Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+      X-Content-Type-Options = "nosniff"
+      X-Frame-Options = "DENY"
+      Referrer-Policy = "no-referrer"
+      Permissions-Policy = "geolocation=(), microphone=(), camera=()"
