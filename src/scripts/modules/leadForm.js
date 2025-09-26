@@ -2,6 +2,7 @@ import { STORAGE_KEYS } from '../config.js'
 import { attachPhoneMask, sanitizePhone, isValidPhone } from '../utils/phone.js'
 import { validateWhatsApp } from '../services/whatsappValidator.js'
 import { inferGenderFromName } from '../utils/gender.js'
+import { setCookie, getCookie } from '../utils/cookie.js'
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i
 
@@ -16,21 +17,70 @@ const sanitizer = {
   email: (value = '') => value.replace(/[<>\s]/g, '').toLowerCase()
 }
 
+const PERSISTENT_COOKIE_DAYS = 365
+
 function setSessionFlag(key, value) {
+  const serialized = JSON.stringify(value)
+  if (typeof serialized === 'undefined') return
   try {
-    sessionStorage.setItem(key, JSON.stringify(value))
+    sessionStorage.setItem(key, serialized)
   } catch (error) {
     console.warn('[LeadForm] Não foi possível persistir estado do formulário.', error)
+  }
+
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(key, serialized)
+    }
+  } catch (error) {
+    console.warn('[LeadForm] Não foi possível persistir estado no localStorage.', error)
+  }
+
+  try {
+    setCookie(key, serialized, { days: PERSISTENT_COOKIE_DAYS })
+  } catch (error) {
+    console.warn('[LeadForm] Não foi possível persistir estado no cookie.', error)
   }
 }
 
 function getSessionFlag(key) {
   try {
     const stored = sessionStorage.getItem(key)
-    return stored ? JSON.parse(stored) : null
-  } catch (error) {
-    return null
+    if (stored) {
+      return JSON.parse(stored)
+    }
+  } catch {
+    // fallback to other storage layers
   }
+
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const fromLocal = localStorage.getItem(key)
+      if (fromLocal) {
+        const parsed = JSON.parse(fromLocal)
+        sessionStorage.setItem(key, fromLocal)
+        return parsed
+      }
+    }
+  } catch (error) {
+    console.warn('[LeadForm] Não foi possível ler estado do localStorage.', error)
+  }
+
+  const fromCookie = getCookie(key)
+  if (fromCookie) {
+    try {
+      const parsed = JSON.parse(fromCookie)
+      sessionStorage.setItem(key, fromCookie)
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(key, fromCookie)
+      }
+      return parsed
+    } catch (error) {
+      console.warn('[LeadForm] Não foi possível interpretar estado do cookie.', error)
+    }
+  }
+
+  return null
 }
 
 function showMessage(container, message, { tone = 'neutral' } = {}) {

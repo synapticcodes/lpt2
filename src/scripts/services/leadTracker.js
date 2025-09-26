@@ -1,12 +1,51 @@
 import { config, STORAGE_KEYS, UTM_KEYS } from '../config.js'
 import { inferGenderFromName } from '../utils/gender.js'
 import { getFacebookIdentifiers } from '../utils/facebook.js'
+import { getCookie, setCookie } from '../utils/cookie.js'
 
 function randomId() {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID()
   }
   return `mnok-${Date.now()}-${Math.floor(Math.random() * 1e6)}`
+}
+
+function setPersistentString(key, value, { days = 365 } = {}) {
+  if (typeof value === 'undefined' || value === null) return
+  const stringValue = String(value)
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(key, stringValue)
+    }
+  } catch (error) {
+    console.warn('[LeadTracker] Não foi possível persistir valor no localStorage.', error)
+  }
+
+  try {
+    setCookie(key, stringValue, { days })
+  } catch (error) {
+    console.warn('[LeadTracker] Não foi possível persistir valor no cookie.', error)
+  }
+}
+
+function getPersistentString(key) {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      const stored = localStorage.getItem(key)
+      if (stored) {
+        return stored
+      }
+    }
+  } catch (error) {
+    console.warn('[LeadTracker] Não foi possível ler localStorage persistente.', error)
+  }
+
+  const cookieValue = getCookie(key)
+  if (cookieValue) {
+    return cookieValue
+  }
+
+  return ''
 }
 
 function storeSessionValue(key, value) {
@@ -67,12 +106,21 @@ class LeadTracker {
   }
 
   ensureSessionId() {
+    const fromCookie = getPersistentString(STORAGE_KEYS.sessionId)
+    if (fromCookie) {
+      storeSessionValue(STORAGE_KEYS.sessionId, fromCookie)
+      return fromCookie
+    }
+
     const fromStorage = getSessionValue(STORAGE_KEYS.sessionId)
     if (fromStorage) {
+      setPersistentString(STORAGE_KEYS.sessionId, fromStorage)
       return fromStorage
     }
+
     const generated = randomId()
     storeSessionValue(STORAGE_KEYS.sessionId, generated)
+    setPersistentString(STORAGE_KEYS.sessionId, generated)
     return generated
   }
 
@@ -93,10 +141,21 @@ class LeadTracker {
       if (existing) {
         return parseJSON(existing)
       }
+
+      const persisted = getPersistentString(STORAGE_KEYS.utm)
+      if (persisted) {
+        const parsed = parseJSON(persisted)
+        if (parsed && typeof parsed === 'object') {
+          storeSessionValue(STORAGE_KEYS.utm, persisted)
+          return parsed
+        }
+      }
       return {}
     }
 
-    storeSessionValue(STORAGE_KEYS.utm, JSON.stringify(collected))
+    const serialized = JSON.stringify(collected)
+    storeSessionValue(STORAGE_KEYS.utm, serialized)
+    setPersistentString(STORAGE_KEYS.utm, serialized, { days: 90 })
     return collected
   }
 
@@ -222,6 +281,37 @@ class LeadTracker {
     return Object.keys(cookies).length ? cookies : undefined
   }
 
+  getPersistedLeadData() {
+    if (typeof window === 'undefined') return {}
+
+    const fromSession = getSessionValue(STORAGE_KEYS.leadPayload)
+    if (fromSession) {
+      const parsedSession = parseJSON(fromSession, null)
+      if (parsedSession && typeof parsedSession === 'object') {
+        return this.normalizeLeadData(parsedSession)
+      }
+    }
+
+    const persisted = getPersistentString(STORAGE_KEYS.leadPayload)
+    if (persisted) {
+      const parsed = parseJSON(persisted, null)
+      if (parsed && typeof parsed === 'object') {
+        storeSessionValue(STORAGE_KEYS.leadPayload, persisted)
+        return this.normalizeLeadData(parsed)
+      }
+    }
+    return {}
+  }
+
+  normalizeLeadData(raw = {}) {
+    const normalized = {}
+    if (typeof raw.name === 'string') normalized.name = raw.name
+    if (typeof raw.email === 'string') normalized.email = raw.email
+    if (typeof raw.phone === 'string') normalized.phone = raw.phone
+    if (typeof raw.gender === 'string') normalized.gender = raw.gender
+    return normalized
+  }
+
   async sendToProcessEvent(eventName, payload) {
     if (!config.supabaseUrl || !config.supabaseAnonKey) {
       console.warn('[LeadTracker] Supabase não configurado — evento não enviado.')
@@ -320,7 +410,9 @@ class LeadTracker {
   }
 
   async sendEvent(eventName, data = {}) {
-    const payload = this.getContextPayload(data)
+    const persistedLead = this.getPersistedLeadData()
+    const mergedData = { ...persistedLead, ...data }
+    const payload = this.getContextPayload(mergedData)
     this.sendCRMEvent(eventName, payload)
     this.sendMetaPixel(eventName, payload)
     await this.sendToProcessEvent(eventName, payload)
