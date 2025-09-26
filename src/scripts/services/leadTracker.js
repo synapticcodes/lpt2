@@ -1,5 +1,6 @@
 import { config, STORAGE_KEYS, UTM_KEYS } from '../config.js'
 import { inferGenderFromName } from '../utils/gender.js'
+import { getFacebookIdentifiers } from '../utils/facebook.js'
 
 function randomId() {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -253,6 +254,14 @@ class LeadTracker {
         geo: payload.geo,
         source: 'landing_builder'
       }
+    }
+
+    const { fbc, fbp } = getFacebookIdentifiers()
+    if (fbc) {
+      body.fbc = fbc
+    }
+    if (fbp) {
+      body.fbp = fbp
     }
 
     if (!body.customData.geo) {
