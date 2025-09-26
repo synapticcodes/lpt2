@@ -343,7 +343,8 @@ class LeadTracker {
         path: payload.path,
         geo: payload.geo,
         source: 'landing_builder'
-      }
+      },
+      externalId: payload.session_id
     }
 
     const { fbc, fbp } = getFacebookIdentifiers()
